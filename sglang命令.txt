@@ -21,13 +21,10 @@ python -m sglang.launch_server --model-path qwen3 --context-length 4096 --max-ru
 
 TORCH_CUDA_ARCH_LIST="8.9"
 --cuda-graph-max-bs
-
+source .venv/bin/activate
 调优脚本
-python benchmark/kernels/fused_moe_triton/tuning_fused_moe_triton.py \
-    --model Qwen/Qwen3-235B-A22B-FP8 \
-    --tp-size 4 \
-    --dtype fp8_w8a8 \
-    --tune
+python tun.py --model qwen3 --dtype fp8_w8a8 --tune -tp-size 4 
+python tun.py --model qwen3 --dtype fp8_w8a8 --tune
 uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
 pip install "ray[all]"
 usage: launch_server.py [-h] --model-path MODEL_PATH [--tokenizer-path TOKENIZER_PATH] [--tokenizer-mode {auto,slow}] [--skip-tokenizer-init]
