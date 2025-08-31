@@ -13,12 +13,19 @@ python -m sglang.launch_server
 --api-key ""
 --disable-cuda-graph-padding  #启用后，每个 batch 使用最接近的、≥ 当前 batch size 的 graph，更高效。
 --mem-fraction-static 0.9
+--allow-auto-truncate #允许自动截断超过最大输入长度的请求，而不是返回错误。
+--watchdog-timeout #以秒为单位设置看门狗超时。如果转发批处理花费的时间超过此时间，服务器将崩溃以防止挂起。
+--chunked-prefill-size #如果在预填充期间发生 OOM，请尝试将 --chunked-prefill-size 减小到 4096 或 2048。这可以节省内存，但会减慢长提示的预填充速度。
+ --max-running-requests。#如果在解码过程中发生 OOM，请尝试降低
+--attention-backend dual_chunk_flash_attn
+--enable-metrics  #监控
+
 86,151 / 512 ≈ 168 个并发 #你设置了 --max-running-requests 1000，但显存最多支持 ~86k tokens，假设平均请求 512 tokens
 
-genai-bench benchmark --api-backend openai             --api-base "http://127.0.0.1:30000"             --api-key 111            --api-model-name "qwen3"             --model-tokenizer "/workspace/qwen3"             --task text-to-text             --max-time-per-run 15             --max-requests-per-run 300             --server-engine "SGLang" --traffic-scenario "D(4096,256)" --num-concurrency 5 --num-concurrency 20
+genai-bench benchmark --api-backend openai             --api-base "http://127.0.0.1:30000"             --api-key 111            --api-model-name "qwen3"             --model-tokenizer "/workspace/qwen3"             --task text-to-text             --max-time-per-run 15             --max-requests-per-run 300             --server-engine "SGLang" --traffic-scenario "D(4096,256)" --num-concurrency 1 --num-concurrency 4 --num-concurrency 48 --num-concurrency 96 --num-concurrency 256 --num-concurrency 512
 
 python -m sglang.launch_server --model-path qwen3 --context-length 4096 --max-running-requests 1000 --device cuda --api-key "" --chunked-prefill-size 4096
-
+/model/HuggingFace/Qwen/Qwen3-30B-A3B-Instruct-2507
 TORCH_CUDA_ARCH_LIST="8.9"
 --cuda-graph-max-bs
 source .venv/bin/activate
